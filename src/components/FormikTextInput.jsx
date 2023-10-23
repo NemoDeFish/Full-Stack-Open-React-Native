@@ -7,16 +7,14 @@ import theme from "../theme";
 
 const styles = StyleSheet.create({
   errorText: {
+    /* Solution: does not need extra margin here because the overall padding of the form is set in SignIn.jsx's main container */
     marginTop: 5,
     color: theme.colors.error,
-    fontSize: 16,
-    marginLeft: 20,
   },
 });
 
 const FormikTextInput = ({ name, ...props }) => {
   const [field, meta, helpers] = useField(name);
-
   // Check if the field is touched and the error message is present
   const showError = meta.touched && meta.error;
 

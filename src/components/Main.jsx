@@ -1,4 +1,4 @@
-import { StyleSheet, View, Platform } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { Route, Routes, Navigate } from "react-router-native";
 
 import RepositoryList from "./RepositoryList";
@@ -11,11 +11,6 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.mainBackground,
     flexGrow: 1,
     flexShrink: 1,
-    fontFamily: Platform.select({
-      android: theme.fonts.android,
-      ios: theme.fonts.ios,
-      default: theme.fonts.main,
-    }),
   },
 });
 
@@ -25,8 +20,8 @@ const Main = () => {
       <AppBar />
 
       <Routes>
-        <Route path="/" element={<RepositoryList />} />
-        <Route path="/signin" element={<SignIn />} />
+        <Route path="/" element={<RepositoryList />} exact />
+        <Route path="sign-in" element={<SignIn />} exact />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </View>

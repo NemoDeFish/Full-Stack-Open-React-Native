@@ -1,10 +1,23 @@
-import * as yup from "yup";
-import { Pressable, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
+import { useNavigate } from "react-router-native";
 import { Formik } from "formik";
+import * as yup from "yup";
 
+import Button from "./Button";
 import FormikTextInput from "./FormikTextInput";
-import Text from "./Text";
-import theme from "../theme";
+import useSignIn from "../hooks/useSignIn";
+
+/* Solution: declare the styles for all components once inside a file globally instead of inside individual components */
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: "white",
+    /* Solution: use padding for outer container instead of margin for each inner <FormikTextInput> */
+    padding: 15,
+  },
+  fieldContainer: {
+    marginBottom: 15,
+  },
+});
 
 const initialValues = {
   username: "",
@@ -17,54 +30,44 @@ const validationSchema = yup.object().shape({
 });
 
 const SignInForm = ({ onSubmit }) => {
-  const styles = StyleSheet.create({
-    container: {
-      backgroundColor: "white",
-    },
-    button: {
-      backgroundColor: theme.colors.primary,
-      borderRadius: 5,
-      color: "white",
-      padding: 20,
-      margin: 20,
-      textAlign: "center",
-    },
-    input: {
-      borderWidth: 1,
-      borderRadius: 5,
-      borderColor: theme.colors.textSecondary,
-      padding: 20,
-      marginBottom: 0,
-      margin: 20,
-      fontSize: 18,
-    },
-  });
-
   return (
     <View style={styles.container}>
-      <FormikTextInput
-        name="username"
-        placeholder="Username"
-        style={styles.input}
-      />
-      <FormikTextInput
-        name="password"
-        placeholder="Password"
-        style={styles.input}
-        secureTextEntry
-      />
-      <Pressable onPress={onSubmit}>
-        <Text style={styles.button} fontWeight="bold" fontSize="subheading">
-          Sign in
-        </Text>
-      </Pressable>
+      {/* Solution: wraps <FormikTextInput> inside <View> and applies 'style.fieldContainer' there so that the marginBottom is applied to both the <TextInput> and the <Text> error, instead of directly applying the style to <FormikTextInput>, which makes the style applied to <TextInput> only, leaving no margin after the <Text> error*/}
+      <View style={styles.fieldContainer}>
+        <FormikTextInput
+          name="username"
+          placeholder="Username"
+          style={styles.field}
+        />
+      </View>
+      <View style={styles.fieldContainer}>
+        <FormikTextInput
+          name="password"
+          placeholder="Password"
+          style={styles.field}
+          secureTextEntry
+        />
+      </View>
+
+      <Button onPress={onSubmit}>Sign in</Button>
     </View>
   );
 };
 
 const SignIn = () => {
-  const onSubmit = (values) => {
-    console.log(values);
+  const [signIn] = useSignIn();
+  const navigate = useNavigate();
+
+  const onSubmit = async (values) => {
+    const { username, password } = values;
+
+    try {
+      const { data } = await signIn({ username, password });
+      console.log(data);
+      navigate("/");
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   return (

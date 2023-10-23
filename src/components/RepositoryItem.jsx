@@ -1,114 +1,139 @@
 import { View, Image, StyleSheet } from "react-native";
+
 import Text from "./Text";
 import theme from "../theme";
+import formatInThousands from "../utils/formatInThousands";
 
-const ItemHeader = ({ item }) => {
-  const styles = StyleSheet.create({
-    container: {
-      flexDirection: "row",
-      flexGrow: 1,
-      height: 100,
-    },
-    avatar: {
-      width: 66,
-      height: 66,
-      borderRadius: 5,
-    },
-    avatarContainer: {
-      flexGrow: 0,
-      paddingRight: 15,
-    },
-    infoContainer: {
-      flexGrow: 1,
-      flexDirection: "column",
-      justifyContent: "space-evenly",
-    },
-    languageContainer: {
-      flexDirection: "row",
-    },
-    languageText: {
-      backgroundColor: theme.colors.primary,
-      borderRadius: 5,
-      color: "white",
-      padding: 4,
-    },
-  });
+/* Solution: declare the styles for all components once inside a file globally instead of inside individual components */
+const styles = StyleSheet.create({
+  /* Solution: group all containers together first */
+  container: {
+    backgroundColor: "white",
+    padding: 15,
+  },
+  topContainer: {
+    flexDirection: "row",
+    /* Solution: try and use 'margin' and 'padding' instead of using fixed 'height' or 'width' */
+    marginBottom: 15,
+  },
+  bottomContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+  },
+  avatarContainer: {
+    flexGrow: 0,
+    /* Solution: use 'margin' for anything outside the container instead of 'padding' */
+    marginRight: 20,
+  },
+  contentContainer: {
+    /* Solution: no need to declare another new flex container with 'flexDirection': "column" because the elements are already in separate rows */
+    /* Solution: there is already a flex container 'topContainer' */
+    flexGrow: 1,
+    flexShrink: 1,
+  },
+  languageContainer: {
+    marginTop: 10,
+    flexDirection: "row",
+  },
+  avatar: {
+    width: 45,
+    height: 45,
+    borderRadius: 5,
+  },
+  /* Solution :sets marginBottom and marginTop of text individually instead of using justifyContent: "space-evenly" */
+  nameText: {
+    marginBottom: 5,
+  },
+  descriptionText: {
+    flexGrow: 1,
+  },
+  languageText: {
+    color: "white",
+    backgroundColor: theme.colors.primary,
+    /* Solution: set roundness value in theme for frequently used values */
+    borderRadius: theme.roundness,
+    /* Solution: set 'flexGrow' for 'flexDirection' items*/
+    flexGrow: 0,
+    paddingVertical: 3,
+    paddingHorizontal: 6,
+  },
+  countItem: {
+    /* Solution: since 'bottomContainer' has a 'flexDirection', 'countItem' should have 'flexGrow' */
+    flexGrow: 0,
+    /* Solution: no need to delcare another flex container 'column' since the elements are already in separate rows */
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 15,
+  },
+  countItemCount: {
+    marginBottom: 5,
+  },
+});
+
+const RepositoryItemTop = ({ item }) => {
+  /* Solution: destructures 'item' object into variables to avoid using dot notation */
+  const { fullName, description, language, ownerAvatarUrl } = item;
 
   return (
-    <View style={styles.container}>
+    <View style={styles.topContainer}>
       <View style={styles.avatarContainer}>
-        <Image
-          style={styles.avatar}
-          source={{ uri: item.ownerAvatarUrl }}
-        ></Image>
+        <Image style={styles.avatar} source={{ uri: ownerAvatarUrl }} />
       </View>
-      <View style={styles.infoContainer}>
-        <Text style={styles.infoText} fontWeight="bold" fontSize="subheading">
-          {item.fullName}
+      <View style={styles.contentContainer}>
+        <Text
+          style={styles.nameText}
+          fontWeight="bold"
+          fontSize="subheading"
+          /* Solution: ensure no truncated text*/
+          numberOfLines={1}
+        >
+          {fullName}
         </Text>
-        <Text style={styles.infoText} color="textSecondary">
-          {item.description}
+        <Text style={styles.descriptionText} color="textSecondary">
+          {description}
         </Text>
-        <View style={styles.languageContainer}>
-          <Text style={styles.languageText}>{item.language}</Text>
-        </View>
+        {/* Solution: checks for the presence of language */}
+        {language ? (
+          <View style={styles.languageContainer}>
+            <Text style={styles.languageText}>{language}</Text>
+          </View>
+        ) : null}
       </View>
     </View>
   );
 };
 
-const ItemFooter = ({ item }) => {
-  const styles = StyleSheet.create({
-    container: {
-      flexDirection: "row",
-      justifyContent: "space-around",
-    },
-    count: {
-      flexDirection: "column",
-      alignItems: "center",
-    },
-  });
-
-  const countSuffix = (number) => {
-    if (number > 1000) {
-      return (number / 1000).toFixed(1) + "k";
-    }
-    return number;
-  };
+/* Solution: repetitive code for displaying count item should be refactored into own component */
+const CountItem = ({ label, count }) => {
   return (
-    <View style={styles.container}>
-      <View style={styles.count}>
-        <Text fontWeight="bold">{countSuffix(item.stargazersCount)}</Text>
-        <Text color="textSecondary">Stars</Text>
-      </View>
-      <View style={styles.count}>
-        <Text fontWeight="bold">{countSuffix(item.forksCount)}</Text>
-        <Text color="textSecondary">Forks</Text>
-      </View>
-      <View style={styles.count}>
-        <Text fontWeight="bold">{item.reviewCount}</Text>
-        <Text color="textSecondary">Reviews</Text>
-      </View>
-      <View style={styles.count}>
-        <Text fontWeight="bold">{item.ratingAverage}</Text>
-        <Text color="textSecondary">Rating</Text>
-      </View>
+    <View style={styles.countItem}>
+      <Text style={styles.countItemCount} fontWeight="bold">
+        {formatInThousands(count)}
+      </Text>
+      <Text color="textSecondary">{label}</Text>
+    </View>
+  );
+};
+
+const RepositoryItemBottom = ({ item }) => {
+  const { forksCount, stargazersCount, ratingAverage, reviewCount } = item;
+
+  return (
+    <View style={styles.bottomContainer}>
+      <CountItem count={stargazersCount} label="Stars" />
+      <CountItem count={forksCount} label="Forks" />
+      <CountItem count={reviewCount} label="Reviews" />
+      <CountItem count={ratingAverage} label="Rating" />
     </View>
   );
 };
 
 const RepositoryItem = ({ item }) => {
-  const styles = StyleSheet.create({
-    container: {
-      backgroundColor: "white",
-      padding: 15,
-    },
-  });
-
   return (
     <View style={styles.container}>
-      <ItemHeader item={item} />
-      <ItemFooter item={item} />
+      {/* Solution: immediately implements containers here using <View> instead of separating into components */}
+      <RepositoryItemTop item={item} />
+      <RepositoryItemBottom item={item} />
     </View>
   );
 };

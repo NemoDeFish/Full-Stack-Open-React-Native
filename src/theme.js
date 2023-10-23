@@ -1,3 +1,5 @@
+import { Platform } from "react-native";
+
 const theme = {
   colors: {
     textPrimary: "#24292e",
@@ -12,14 +14,18 @@ const theme = {
     subheading: 16,
   },
   fonts: {
-    main: "System",
-    ios: "Arial",
-    android: "Roboto",
+    /* Solution: implements the platform-specific selection in 'theme.js' instead of at 'Main.jsx' because the components use the fontFamily as 'theme.fonts.main'. So to avoid changing all the code which overwrites the font family, we retain 'main' as the main font family and change the selection under 'main' */
+    main: Platform.select({
+      ios: "Arial",
+      android: "Roboto",
+      default: "System",
+    }),
   },
   fontWeights: {
     normal: "400",
     bold: "700",
   },
+  roundness: 3,
 };
 
 export default theme;
