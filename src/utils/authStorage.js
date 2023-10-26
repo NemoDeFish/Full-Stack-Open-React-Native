@@ -5,23 +5,28 @@ class AuthStorage {
     this.namespace = namespace;
   }
 
-  async getAccessToken() {
+  /* Solution: uses a function to get the key and use the function in the remaining methods to eliminate hardcoding and repeating `${this.namespace}:accessToken` for each methods */
+  getKey(key) {
+    return `${this.namespace}:${key}`;
+  }
+
+  /* Solution removes 'async' & 'await' */
+  /* Solution: returns the 'AsyncStorage' methods instead of returning the obtained values*/
+  getAccessToken() {
     // Get the access token for the storage
-    const token = await AsyncStorage.getItem(`${this.namespace}:token`);
-    return token ? JSON.parse(token) : undefined;
+    /* Solution: removes 'JSON.parse' */
+    return AsyncStorage.getItem(this.getKey("accessToken"));
   }
 
-  async setAccessToken(accessToken) {
+  setAccessToken(accessToken) {
     // Add the access token to the storage
-    await AsyncStorage.setItem(
-      `${this.namespace}:token`,
-      JSON.stringify(accessToken)
-    );
+    /* Solution: removes 'JSON.stringify' */
+    return AsyncStorage.setItem(this.getKey("accessToken"), accessToken);
   }
 
-  async removeAccessToken() {
+  removeAccessToken() {
     // Remove the access token from the storage
-    await AsyncStorage.removeItem(`${this.namespace}:token`);
+    return AsyncStorage.removeItem(this.getKey("accessToken"));
   }
 }
 

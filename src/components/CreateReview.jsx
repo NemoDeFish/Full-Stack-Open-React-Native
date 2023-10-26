@@ -1,0 +1,79 @@
+import { StyleSheet, View } from "react-native";
+import { Formik } from "formik";
+import { useMutation } from "@apollo/client";
+import { useNavigate } from "react-router-native";
+import * as yup from "yup";
+
+import FormikTextInput from "./FormikTextInput";
+import Button from "./Button";
+import { CREATE_REVIEW } from "../graphql/mutations";
+
+const initialValues = {
+  ownerName: "",
+  repositoryName: "",
+  rating: 0,
+  text: "",
+};
+
+const validationSchema = yup.object().shape({
+  ownerName: yup.string().required("Repository owner's name is required"),
+  repositoryName: yup.string().required("Repository name is required"),
+  rating: yup
+    .number()
+    .required("Rating is required")
+    .min(0, "Rating must be between 0 and 100")
+    .max(100, "Rating must be between 0 and 100"),
+  text: yup.string(),
+});
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 15,
+    backgroundColor: "white",
+  },
+  fieldContainer: {
+    marginBottom: 15,
+  },
+});
+const CreateReviewForm = ({ onSubmit }) => {
+  return (
+    <View style={styles.container}>
+      <View style={styles.fieldContainer}>
+        <FormikTextInput name="ownerName" placeholder="Repository owner name" />
+      </View>
+      <View style={styles.fieldContainer}>
+        <FormikTextInput name="repositoryName" placeholder="Repository name" />
+      </View>
+      <View style={styles.fieldContainer}>
+        <FormikTextInput name="rating" placeholder="Rating between 0 and 100" />
+      </View>
+      <View style={styles.fieldContainer}>
+        <FormikTextInput name="text" placeholder="Review" multiline />
+      </View>
+      <Button onPress={onSubmit}>Create a review</Button>
+    </View>
+  );
+};
+
+const CreateReview = () => {
+  const [mutate] = useMutation(CREATE_REVIEW);
+  const navigate = useNavigate();
+
+  const onSubmit = async (values) => {
+    try {
+      const review = { ...values, rating: Number(values.rating) };
+      const { data } = await mutate({ variables: { review } });
+      navigate(`/${data.createReview.repositoryId}`, { replace: true });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  return (
+    <Formik initialValues={initialValues} onSubmit={onSubmit} validationSchema={validationSchema}>
+      {({ handleSubmit }) => <CreateReviewForm onSubmit={handleSubmit} />}
+    </Formik>
+  );
+};
+
+export default CreateReview;

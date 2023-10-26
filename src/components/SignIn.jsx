@@ -34,11 +34,7 @@ const SignInForm = ({ onSubmit }) => {
     <View style={styles.container}>
       {/* Solution: wraps <FormikTextInput> inside <View> and applies 'style.fieldContainer' there so that the marginBottom is applied to both the <TextInput> and the <Text> error, instead of directly applying the style to <FormikTextInput>, which makes the style applied to <TextInput> only, leaving no margin after the <Text> error*/}
       <View style={styles.fieldContainer}>
-        <FormikTextInput
-          name="username"
-          placeholder="Username"
-          style={styles.field}
-        />
+        <FormikTextInput name="username" placeholder="Username" style={styles.field} />
       </View>
       <View style={styles.fieldContainer}>
         <FormikTextInput
@@ -54,6 +50,14 @@ const SignInForm = ({ onSubmit }) => {
   );
 };
 
+export const SignInContainer = ({ onSubmit }) => {
+  return (
+    <Formik initialValues={initialValues} onSubmit={onSubmit} validationSchema={validationSchema}>
+      {({ handleSubmit }) => <SignInForm onSubmit={handleSubmit} />}
+    </Formik>
+  );
+};
+
 const SignIn = () => {
   const [signIn] = useSignIn();
   const navigate = useNavigate();
@@ -61,24 +65,15 @@ const SignIn = () => {
   const onSubmit = async (values) => {
     const { username, password } = values;
 
-    try {
-      const { data } = await signIn({ username, password });
-      console.log(data);
-      navigate("/");
-    } catch (e) {
-      console.log(e);
-    }
+    /* Solution: does not assign the { data } return value from 'signIn', which is different from exercises */
+    /* Solution: eliminates the try-catch block and catching errors, which is different from exercises, however navigate is still run only after a successful sign in? */
+    await signIn({ username, password });
+
+    /* Solution: includes `{ replace: true }` to replace current entry in history stack instead of adding a new one */
+    navigate("/", { replace: true });
   };
 
-  return (
-    <Formik
-      initialValues={initialValues}
-      onSubmit={onSubmit}
-      validationSchema={validationSchema}
-    >
-      {({ handleSubmit }) => <SignInForm onSubmit={handleSubmit} />}
-    </Formik>
-  );
+  return <SignInContainer onSubmit={onSubmit} />;
 };
 
 export default SignIn;

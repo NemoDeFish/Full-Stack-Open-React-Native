@@ -130,7 +130,7 @@ const RepositoryItemBottom = ({ item }) => {
 
 const RepositoryItem = ({ item }) => {
   return (
-    <View style={styles.container}>
+    <View testID="repositoryItem" style={styles.container}>
       {/* Solution: immediately implements containers here using <View> instead of separating into components */}
       <RepositoryItemTop item={item} />
       <RepositoryItemBottom item={item} />
