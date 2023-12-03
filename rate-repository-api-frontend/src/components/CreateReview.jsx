@@ -18,11 +18,12 @@ const initialValues = {
 const validationSchema = yup.object().shape({
   ownerName: yup.string().required("Repository owner's name is required"),
   repositoryName: yup.string().required("Repository name is required"),
+  /* Solution: provide a suitable error message for each validation */
   rating: yup
-    .number()
+    .number("Rating must be a number")
     .required("Rating is required")
-    .min(0, "Rating must be between 0 and 100")
-    .max(100, "Rating must be between 0 and 100"),
+    .min(0, "Rating must be greater or equal to 0")
+    .max(100, "Rating must be less or equal to 100"),
   text: yup.string(),
 });
 
@@ -35,6 +36,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
 });
+
 const CreateReviewForm = ({ onSubmit }) => {
   return (
     <View style={styles.container}>
@@ -45,7 +47,12 @@ const CreateReviewForm = ({ onSubmit }) => {
         <FormikTextInput name="repositoryName" placeholder="Repository name" />
       </View>
       <View style={styles.fieldContainer}>
-        <FormikTextInput name="rating" placeholder="Rating between 0 and 100" />
+        <FormikTextInput
+          /* Solution: can set `keyboardType="numeric"` */
+          keyboardType="numeric"
+          name="rating"
+          placeholder="Rating between 0 and 100"
+        />
       </View>
       <View style={styles.fieldContainer}>
         <FormikTextInput name="text" placeholder="Review" multiline />
@@ -61,9 +68,15 @@ const CreateReview = () => {
 
   const onSubmit = async (values) => {
     try {
+      /* Solution: uses 'parseInt' instead of 'Number', I think it's the same*/
       const review = { ...values, rating: Number(values.rating) };
+
       const { data } = await mutate({ variables: { review } });
-      navigate(`/${data.createReview.repositoryId}`, { replace: true });
+
+      /* Solution: check for the presence of if(data?.createReview) before redirecting instead of implementing error catching, however you won't be able to log the errors */
+      if (data?.createReview) {
+        navigate(`/repositories/${data.createReview.repositoryId}`);
+      }
     } catch (e) {
       console.log(e);
     }

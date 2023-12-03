@@ -16,6 +16,7 @@ export const AUTHENTICATE = gql`
   ${USER_BASE_FIELDS}
 `;
 
+/* Solution returns '...reviewBaseFields' and 'repositoryBaseFields', however I don't think this is necessary */
 export const CREATE_REVIEW = gql`
   mutation createReview($review: CreateReviewInput) {
     createReview(review: $review) {
@@ -24,6 +25,7 @@ export const CREATE_REVIEW = gql`
   }
 `;
 
+/* Solution returns '...userBaseFields' instead of just 'id', however I don't think this is necessary */
 export const CREATE_USER = gql`
   mutation createUser($user: CreateUserInput) {
     createUser(user: $user) {

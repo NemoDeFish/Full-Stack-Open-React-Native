@@ -16,19 +16,20 @@ const initialValues = {
 };
 
 const validationSchema = yup.object().shape({
+  /* Solution: gives error message specific to the error */
   username: yup
     .string()
     .required("Username is required")
-    .min(5, "Username must have a length between 5 and 30")
-    .max(30, "Username must have a length between 5 and 30"),
+    .min(5, "Username must be at least 5 characters long")
+    .max(30, "Username must be at most 30 characters long"),
   password: yup
     .string()
     .required("Password is required")
-    .min(5, "Password must have a length between 5 and 50")
-    .max(50, "Password must have a length between 5 and 50"),
+    .min(5, "Password must be at least 5 characters long")
+    .max(50, "Password must be at least 50 characters long"),
   passwordConfirm: yup
     .string()
-    .oneOf([yup.ref("$password"), null], "Password confirmation must match the password")
+    .oneOf([yup.ref("password"), null], "Password confirmation must match the password")
     .required("Password confirmation is required"),
 });
 
@@ -41,6 +42,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
 });
+
 const SignUpForm = ({ onSubmit }) => {
   return (
     <View style={styles.container}>
@@ -68,11 +70,19 @@ const SignUp = () => {
   const navigate = useNavigate();
 
   const onSubmit = async (values) => {
+    /* Solution: doesn't handle error catching */
     try {
+      /* Solution: destrucutres 'username' and 'password' instead of deleting 'passwordConfirm' */
+      // const { username, password } = values;
+      // const user = { username, password };
+
       delete values.passwordConfirm;
+
       const user = values;
+
       await mutate({ variables: { user } });
       await signIn(user);
+
       navigate("/", { replace: true });
     } catch (e) {
       console.log(e);

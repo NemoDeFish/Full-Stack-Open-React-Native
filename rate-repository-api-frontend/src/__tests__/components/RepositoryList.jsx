@@ -1,6 +1,22 @@
-import { render, screen } from "@testing-library/react-native";
+import { render, within } from "@testing-library/react-native";
 
 import { RepositoryListContainer } from "../../components/RepositoryList";
+
+const expectRepositoryItemToHaveCorrectInformation = (
+  item,
+  { name, description, languages, stars, forks, reviews, rating }
+) => {
+  /* Solution: uses 'getByText' and 'toBeDefined' instead of 'toHaveTextContent' */
+  const wrappedItem = within(item);
+
+  expect(wrappedItem.getByText(name)).toBeDefined();
+  expect(wrappedItem.getByText(description)).toBeDefined();
+  expect(wrappedItem.getByText(languages)).toBeDefined();
+  expect(wrappedItem.getByText(stars)).toBeDefined();
+  expect(wrappedItem.getByText(forks)).toBeDefined();
+  expect(wrappedItem.getByText(reviews)).toBeDefined();
+  expect(wrappedItem.getByText(rating)).toBeDefined();
+};
 
 describe("RepositoryList", () => {
   describe("RepositoryListContainer", () => {
@@ -44,30 +60,34 @@ describe("RepositoryList", () => {
         ],
       };
 
-      render(<RepositoryListContainer repositories={repositories} />);
-
-      screen.debug();
+      /* Solution: get 'getAllByTestId' directly from the render method instead of using `screen.getAllByTestId` */
+      const { getAllByTestId } = render(<RepositoryListContainer repositories={repositories} />);
 
       // Add your test code here
-      const repositoryItems = screen.getAllByTestId("repositoryItem");
+      const repositoryItems = getAllByTestId("repositoryItem");
       const [firstRepositoryItem, secondRepositoryItem] = repositoryItems;
 
       // expect something from the first and the second repository item
-      expect(firstRepositoryItem).toHaveTextContent("jaredpalmer/formik");
-      expect(firstRepositoryItem).toHaveTextContent("Build forms in React, without the tears");
-      expect(firstRepositoryItem).toHaveTextContent("TypeScript");
-      expect(firstRepositoryItem).toHaveTextContent("21.9kStars");
-      expect(firstRepositoryItem).toHaveTextContent("1.6kForks");
-      expect(firstRepositoryItem).toHaveTextContent("3Reviews");
-      expect(firstRepositoryItem).toHaveTextContent("88Rating");
+      /* Solution: both expects are repetitive, so we can refactor them into a function */
+      expectRepositoryItemToHaveCorrectInformation(firstRepositoryItem, {
+        name: "jaredpalmer/formik",
+        description: "Build forms in React, without the tears",
+        languages: "TypeScript",
+        stars: "21.9k",
+        forks: "1.6k",
+        reviews: "3",
+        rating: "88",
+      });
 
-      expect(secondRepositoryItem).toHaveTextContent("async-library/react-async");
-      expect(secondRepositoryItem).toHaveTextContent("Flexible promise-based React data loader");
-      expect(secondRepositoryItem).toHaveTextContent("JavaScript");
-      expect(secondRepositoryItem).toHaveTextContent("1.8kStars");
-      expect(secondRepositoryItem).toHaveTextContent("69Forks");
-      expect(secondRepositoryItem).toHaveTextContent("3Reviews");
-      expect(secondRepositoryItem).toHaveTextContent("72Rating");
+      expectRepositoryItemToHaveCorrectInformation(secondRepositoryItem, {
+        name: "async-library/react-async",
+        description: "Flexible promise-based React data loader",
+        languages: "JavaScript",
+        stars: "1.8k",
+        forks: "69",
+        reviews: "3",
+        rating: "72",
+      });
     });
   });
 });

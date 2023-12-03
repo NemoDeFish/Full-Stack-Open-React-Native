@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   tabTouchable: {
-    flexGrow: 1,
+    flexGrow: 0,
   },
   /* Solution: wrap <Text> inside of <View> and set the styles as a tabContainer instead of setting the margin for <Text> or <Link> */
   tabContainer: {
@@ -63,7 +63,7 @@ const AppBar = () => {
   const authStorage = useAuthStorage();
   const navigate = useNavigate();
 
-  const { currentUser } = useCurrentUser({ includeReviews: true });
+  const { currentUser } = useCurrentUser();
 
   const onSignOut = async () => {
     await authStorage.removeAccessToken();
@@ -81,7 +81,7 @@ const AppBar = () => {
         {/* Solution: passing the function directly and passing a function that calls the function handler is the same */}
         {currentUser ? (
           <>
-            <AppBarTab to="/create">Create a review</AppBarTab>
+            <AppBarTab to="/create-review">Create a review</AppBarTab>
             <AppBarTab to="/my-reviews">My reviews</AppBarTab>
             <AppBarTab onPress={onSignOut}>Sign out</AppBarTab>
           </>

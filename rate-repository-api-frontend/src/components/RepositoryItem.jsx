@@ -1,7 +1,9 @@
+import * as Linking from "expo-linking";
 import { View, Image, StyleSheet } from "react-native";
 
 import Text from "./Text";
 import theme from "../theme";
+import Button from "./Button";
 import formatInThousands from "../utils/formatInThousands";
 
 /* Solution: declare the styles for all components once inside a file globally instead of inside individual components */
@@ -68,6 +70,9 @@ const styles = StyleSheet.create({
   countItemCount: {
     marginBottom: 5,
   },
+  githubButton: {
+    marginTop: 15,
+  },
 });
 
 const RepositoryItemTop = ({ item }) => {
@@ -128,12 +133,23 @@ const RepositoryItemBottom = ({ item }) => {
   );
 };
 
-const RepositoryItem = ({ item }) => {
+const RepositoryItem = ({ item, showGithubLink = false }) => {
+  /* Solution: separates the 'onPress' function into a separate function instead of directly implementing it inside when passing props, however, I don't think it's necessary as it's so short */
+  const onGithubLinkClick = () => {
+    Linking.openURL(item.url);
+  };
+
   return (
     <View testID="repositoryItem" style={styles.container}>
       {/* Solution: immediately implements containers here using <View> instead of separating into components */}
       <RepositoryItemTop item={item} />
       <RepositoryItemBottom item={item} />
+      {/* Solution: checks for item.url additionally before rendering the button */}
+      {showGithubLink && item.url && (
+        <Button style={styles.githubButton} onPress={onGithubLinkClick}>
+          Open in GitHub
+        </Button>
+      )}
     </View>
   );
 };

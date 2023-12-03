@@ -27,19 +27,21 @@ export const USER_BASE_FIELDS = gql`
   }
 `;
 
+/* Solution: includes 'userId' and 'repositoryId' */
 export const REVIEW_BASE_FIELDS = gql`
   fragment reviewBaseFields on Review {
     id
     text
     rating
     createdAt
-    user {
-      id
-      username
-    }
-    repository {
-      fullName
-      id
-    }
+  }
+`;
+
+export const PAGE_INFO_FIELDS = gql`
+  fragment pageInfoFields on PageInfo {
+    endCursor
+    startCursor
+    hasPreviousPage
+    hasNextPage
   }
 `;
